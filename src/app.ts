@@ -29,7 +29,7 @@ class Server{
         this.app.use(BodyParser.urlencoded({extended: false}));
         this.app.use(BodyParser.json());
         console.log("desde app.ts env: ", process.env.PORT)
-        this.port = Number(process.env.PORT || '8080');
+        this.port = Number(process.env.PORT) || 8080;
         this.server = new http.Server(this.app);
         this.dbConnection();
         this.middlewares();
