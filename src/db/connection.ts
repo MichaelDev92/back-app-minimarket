@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 
-const db = new Sequelize('minimarketDB', 'root', '', {
+const db = new Sequelize('minimarketdb', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define:{
