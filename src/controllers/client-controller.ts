@@ -3,6 +3,7 @@ import Cliente from "../models/cliente";
 import { Result, validationResult } from "express-validator";
 import db from "../db/connection";
 import { crearFechaFormateada } from "../utils/util";
+import bcrypt from 'bcrypt';
 
 export const getClientes = async(req: Request, res: Response) => {
 
@@ -63,7 +64,7 @@ export const postCliente = async(req: Request, res: Response) => {
 
     
     if(!result.isEmpty()){
-        return res.status(500).json(result['errors'][0]);
+        return res.status(500).json(result['errors']);
     }
     
     let completeBody = {};
@@ -85,8 +86,22 @@ export const postCliente = async(req: Request, res: Response) => {
         });
         
         if(existeNit){
-            return res.status(500).json({msg: `El numero de documento ${body.nit} ya está registrado para un cliente.`})
+            return res.status(500).json({msg: `El nit ${body.nit} ya está registrado para un cliente.`})
         }
+
+        const existeCorreo = await Cliente.findOne({
+            where:{
+                correo: body.correo
+            }
+        });
+        
+        if(existeCorreo){
+            return res.status(500).json({msg: `El correo ${body.correo} ya está registrado para un cliente.`})
+        }
+
+        const passhashed = await bcrypt.hashSync(body.password, 10);
+
+        body.password = passhashed;
         
         completeBody = {...body, created_at: fechaHoy, updated_at: fechaHoy};
         
@@ -95,7 +110,6 @@ export const postCliente = async(req: Request, res: Response) => {
         return res.status(200).json({cliente});
         
     } catch (error) {
-        console.log("error en post usuario...",error);
         return res.status(500).json({
             msg: error
         });  

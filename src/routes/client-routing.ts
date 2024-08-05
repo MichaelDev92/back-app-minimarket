@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { check, query } from "express-validator";
+import { body, query } from "express-validator";
 import { validateToken } from "../utils/util";
 import { deleteCliente, getClienteByNit, getClientes, postCliente, putCliente } from "../controllers/client-controller";
 
@@ -16,8 +16,15 @@ router.get('/', [
 router.get('/getByNit', [
     query('id', 'El parametro id no se encuentra presente en la peticion').exists()
                 ], validateToken, getClienteByNit);
-router.post('/', [check('req.body', 'El Body no se encuentra presente en la petición').exists()], validateToken,postCliente);
-router.put('/', [check('req.body', 'El Body no se encuentra presente en la petición').exists()],validateToken, putCliente);
+router.post('/', [
+    body('nit', 'El nit no está presente en la petición').exists(),
+    body('nombre', 'El nombres no está presente en la petición').exists(),
+    body('correo', 'El nombres no está presente en la petición').exists(),
+    body('password', 'El nombres no está presente en la petición').exists(),
+    body('telefono', 'El nombres no está presente en la petición').exists(),
+    body('estado', 'El nombres no está presente en la petición').exists(),
+                    ],postCliente);
+router.put('/', [],validateToken, putCliente);
 router.put('/delete', 
     query('nombres', 'El parametro nombres no se encuentra presente en la peticion').exists(), validateToken, deleteCliente);
 
