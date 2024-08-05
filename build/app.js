@@ -34,7 +34,7 @@ class Server {
         this.app.use(body_parser_1.default.urlencoded({ extended: false }));
         this.app.use(body_parser_1.default.json());
         console.log("desde app.ts env: ", process.env.PORT);
-        this.port = Number(process.env.PORT || '8080');
+        this.port = Number(process.env.PORT) || 8080;
         this.server = new http_1.default.Server(this.app);
         this.dbConnection();
         this.middlewares();
