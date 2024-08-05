@@ -8,6 +8,7 @@ import BodyParser from 'body-parser';
 /* importing routes */
 import auth from './routes/auth';
 import clientRouting from './routes/client-routing';
+import productRouting from './routes/product-routing'
 
 class Server{
 
@@ -16,7 +17,8 @@ class Server{
     private server: http.Server;
     private apiPaths = {
         clients: '/api/clients',
-        auth: '/api/auth'
+        auth: '/api/auth',
+        products: '/api/products'
     }
 
     constructor() {
@@ -61,6 +63,7 @@ class Server{
         // API routes
         this.app.use(this.apiPaths.clients, clientRouting);
         this.app.use(this.apiPaths.auth, auth);
+        this.app.use(this.apiPaths.products, productRouting);
     }
 
     listen(){
