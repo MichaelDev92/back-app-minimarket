@@ -22,7 +22,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_routing_1 = __importDefault(require("./routes/client-routing"));
 const product_routing_1 = __importDefault(require("./routes/product-routing"));
-dotenv_1.default.config({ path: './.env' });
+dotenv_1.default.config();
 class Server {
     constructor() {
         this.apiPaths = {
