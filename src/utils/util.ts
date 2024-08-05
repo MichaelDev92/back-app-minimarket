@@ -13,7 +13,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
     console.log("header token: ",headerToken, " url solicitada: ", urlRequested, " body:", req.body);
 
 
-    if(urlRequested.includes('/sysapi/') || urlRequested.includes('SYS')){
+    if(urlRequested.includes('/api/') || urlRequested.includes('SYS')){
         keyName = process.env.SYS_KEY || '%SYS#KEY%';
     }else{
         keyName = process.env.STORE_KEY || '#STORE$KEY^';
@@ -59,7 +59,7 @@ const refreshToken = (req: Request, res: Response)=>{
        return res.status(401).json({msg: 'El Token de actualización no se encuentra en el header'});
     }
 
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
 
     if(refreshToken !== undefined && refreshToken.startsWith('Bearer ')){
 
@@ -102,14 +102,14 @@ const refreshToken = (req: Request, res: Response)=>{
 
 const generarToken = (payload: any, urlRequested: any) =>{
 
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
 
     return jwt.sign(payload, keyName, {expiresIn: '15m'});
 }
 
 const generarRefreshToken = (payload: any, urlRequested: any) =>{
     
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
 
     const refreshToken = jwt.sign(payload, keyName, {expiresIn: '2h'});
 

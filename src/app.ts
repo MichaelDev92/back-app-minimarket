@@ -3,12 +3,15 @@ import cors  from 'cors';
 import http from 'http';
 import  db  from './db/connection';
 import BodyParser from 'body-parser';
+import dotenv from "dotenv";
 
 
 /* importing routes */
 import auth from './routes/auth';
 import clientRouting from './routes/client-routing';
 import productRouting from './routes/product-routing'
+
+dotenv.config(); 
 
 class Server{
 
@@ -27,6 +30,7 @@ class Server{
         this.app.use(BodyParser.json());
         this.port = process.env.PORT || '3000';
         this.server = new http.Server(this.app);
+        this.dbConnection();
         this.middlewares();
         this.routes();
     }

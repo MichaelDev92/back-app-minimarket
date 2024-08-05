@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 /* models import */
 import Cliente from "../models/cliente";
 import SessionCliente from "../models/session_cliente";
+
+/** utils import */
 import { generarToken, generarRefreshToken } from "../utils/util";
 
 dotenv.config();
@@ -28,7 +30,13 @@ const getAuthentication = async (req: Request, res: Response)=>{
 
     if(!client){
         return res.status(412).json({
-            msg: 'Usuario no encontrado.'
+            msg: 'Negocio no encontrado.'
+        });
+    }
+
+    if(client?.dataValues['estado']!==1){
+        return res.status(412).json({
+            msg: 'Negocio inhabilitado y/o eliminado, consulte el administrador del sistema.'
         });
     }
 
@@ -57,12 +65,10 @@ const getAuthentication = async (req: Request, res: Response)=>{
 
                 const token = generarToken({client: client?.dataValues},req.url);
                 const refreshToken = generarRefreshToken({client: client?.dataValues},req.url);
-
-                const decodedJWT = JSON.parse(window.atob(token.split('.')[1]));
-
+                const decodedJWT = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
                 await SessionCliente.create({
                                             cliente_id: client?.dataValues['id'],
-                                            fecha_expiracion: new Date(decodedJWT?.exp),
+                                            fecha_expiracion: new Date(decodedJWT?.exp * 1000),
                                             token: token,
                                             refresh_token: refreshToken,
                                             estado: 1
