@@ -17,6 +17,7 @@ const cliente_1 = __importDefault(require("../models/cliente"));
 const express_validator_1 = require("express-validator");
 const connection_1 = __importDefault(require("../db/connection"));
 const util_1 = require("../utils/util");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const getClientes = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const results = (0, express_validator_1.validationResult)(req);
     if (!results.isEmpty()) {
@@ -65,7 +66,7 @@ exports.getClienteByNit = getClienteByNit;
 const postCliente = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = (0, express_validator_1.validationResult)(req);
     if (!result.isEmpty()) {
-        return res.status(500).json(result['errors'][0]);
+        return res.status(500).json(result['errors']);
     }
     let completeBody = {};
     const { body } = req;
@@ -81,14 +82,23 @@ const postCliente = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
         });
         if (existeNit) {
-            return res.status(500).json({ msg: `El numero de documento ${body.nit} ya está registrado para un cliente.` });
+            return res.status(500).json({ msg: `El nit ${body.nit} ya está registrado para un cliente.` });
         }
+        const existeCorreo = yield cliente_1.default.findOne({
+            where: {
+                correo: body.correo
+            }
+        });
+        if (existeCorreo) {
+            return res.status(500).json({ msg: `El correo ${body.correo} ya está registrado para un cliente.` });
+        }
+        const passhashed = yield bcrypt_1.default.hashSync(body.password, 10);
+        body.password = passhashed;
         completeBody = Object.assign(Object.assign({}, body), { created_at: fechaHoy, updated_at: fechaHoy });
         const cliente = yield cliente_1.default.create(completeBody);
         return res.status(200).json({ cliente });
     }
     catch (error) {
-        console.log("error en post usuario...", error);
         return res.status(500).json({
             msg: error
         });

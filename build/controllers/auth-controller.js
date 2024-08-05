@@ -18,6 +18,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 /* models import */
 const cliente_1 = __importDefault(require("../models/cliente"));
 const session_cliente_1 = __importDefault(require("../models/session_cliente"));
+/** utils import */
 const util_1 = require("../utils/util");
 dotenv_1.default.config();
 const getAuthentication = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,7 +34,12 @@ const getAuthentication = (req, res) => __awaiter(void 0, void 0, void 0, functi
     });
     if (!client) {
         return res.status(412).json({
-            msg: 'Usuario no encontrado.'
+            msg: 'Negocio no encontrado.'
+        });
+    }
+    if ((client === null || client === void 0 ? void 0 : client.dataValues['estado']) !== 1) {
+        return res.status(412).json({
+            msg: 'Negocio inhabilitado y/o eliminado, consulte el administrador del sistema.'
         });
     }
     const sessionActiva = yield session_cliente_1.default.findOne({
@@ -56,10 +62,10 @@ const getAuthentication = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 client === null || client === void 0 ? true : delete client.dataValues['updated_at'];
                 const token = (0, util_1.generarToken)({ client: client === null || client === void 0 ? void 0 : client.dataValues }, req.url);
                 const refreshToken = (0, util_1.generarRefreshToken)({ client: client === null || client === void 0 ? void 0 : client.dataValues }, req.url);
-                const decodedJWT = JSON.parse(window.atob(token.split('.')[1]));
+                const decodedJWT = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
                 yield session_cliente_1.default.create({
                     cliente_id: client === null || client === void 0 ? void 0 : client.dataValues['id'],
-                    fecha_expiracion: new Date(decodedJWT === null || decodedJWT === void 0 ? void 0 : decodedJWT.exp),
+                    fecha_expiracion: new Date((decodedJWT === null || decodedJWT === void 0 ? void 0 : decodedJWT.exp) * 1000),
                     token: token,
                     refresh_token: refreshToken,
                     estado: 1

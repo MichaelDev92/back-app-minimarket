@@ -35,7 +35,7 @@ const validateToken = (req, res, next) => {
     const urlRequested = req.url;
     let keyName = '';
     console.log("header token: ", headerToken, " url solicitada: ", urlRequested, " body:", req.body);
-    if (urlRequested.includes('/sysapi/') || urlRequested.includes('SYS')) {
+    if (urlRequested.includes('/api/') || urlRequested.includes('SYS')) {
         keyName = process.env.SYS_KEY || '%SYS#KEY%';
     }
     else {
@@ -74,7 +74,7 @@ const refreshToken = (req, res) => {
     if (!refreshToken) {
         return res.status(401).json({ msg: 'El Token de actualización no se encuentra en el header' });
     }
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
     if (refreshToken !== undefined && refreshToken.startsWith('Bearer ')) {
         try {
             const bearerToken = refreshToken === null || refreshToken === void 0 ? void 0 : refreshToken.slice(7);
@@ -107,12 +107,12 @@ const refreshToken = (req, res) => {
 };
 exports.refreshToken = refreshToken;
 const generarToken = (payload, urlRequested) => {
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
     return jsonwebtoken_1.default.sign(payload, keyName, { expiresIn: '15m' });
 };
 exports.generarToken = generarToken;
 const generarRefreshToken = (payload, urlRequested) => {
-    const keyName = urlRequested.includes('/sysapi/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
+    const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY_REFRESH || '%SYS#KEY%R3' : process.env.STORE_KEY_REFRESH || '#STORE$KEY^R3';
     const refreshToken = jsonwebtoken_1.default.sign(payload, keyName, { expiresIn: '2h' });
     return refreshToken;
 };
