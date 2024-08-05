@@ -17,20 +17,25 @@ const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
 const connection_1 = __importDefault(require("./db/connection"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const dotenv_1 = __importDefault(require("dotenv"));
 /* importing routes */
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_routing_1 = __importDefault(require("./routes/client-routing"));
+const product_routing_1 = __importDefault(require("./routes/product-routing"));
+dotenv_1.default.config();
 class Server {
     constructor() {
         this.apiPaths = {
             clients: '/api/clients',
-            auth: '/api/auth'
+            auth: '/api/auth',
+            products: '/api/products'
         };
         this.app = (0, express_1.default)();
         this.app.use(body_parser_1.default.urlencoded({ extended: false }));
         this.app.use(body_parser_1.default.json());
         this.port = process.env.PORT || '3000';
         this.server = new http_1.default.Server(this.app);
+        this.dbConnection();
         this.middlewares();
         this.routes();
     }
@@ -59,6 +64,7 @@ class Server {
         // API routes
         this.app.use(this.apiPaths.clients, client_routing_1.default);
         this.app.use(this.apiPaths.auth, auth_1.default);
+        this.app.use(this.apiPaths.products, product_routing_1.default);
     }
     listen() {
         this.server.listen(this.port, () => {
