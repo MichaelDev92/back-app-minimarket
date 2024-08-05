@@ -22,7 +22,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_routing_1 = __importDefault(require("./routes/client-routing"));
 const product_routing_1 = __importDefault(require("./routes/product-routing"));
-dotenv_1.default.config();
+dotenv_1.default.config({ path: './.env' });
 class Server {
     constructor() {
         this.apiPaths = {
@@ -33,6 +33,7 @@ class Server {
         this.app = (0, express_1.default)();
         this.app.use(body_parser_1.default.urlencoded({ extended: false }));
         this.app.use(body_parser_1.default.json());
+        console.log("desde app.ts env: ", process.env.PORT);
         this.port = process.env.PORT || '3000';
         this.server = new http_1.default.Server(this.app);
         this.dbConnection();

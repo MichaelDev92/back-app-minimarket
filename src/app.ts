@@ -28,6 +28,7 @@ class Server{
         this.app = express();
         this.app.use(BodyParser.urlencoded({extended: false}));
         this.app.use(BodyParser.json());
+        console.log("desde app.ts env: ", process.env.PORT)
         this.port = process.env.PORT || '3000';
         this.server = new http.Server(this.app);
         this.dbConnection();
