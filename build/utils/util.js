@@ -148,7 +148,7 @@ const refreshToken = (req, res) => {
 exports.refreshToken = refreshToken;
 const generarToken = (payload, urlRequested) => {
     const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
-    return jsonwebtoken_1.default.sign(payload, keyName, { expiresIn: '15m' });
+    return jsonwebtoken_1.default.sign(payload, keyName, { expiresIn: '45m' });
 };
 exports.generarToken = generarToken;
 const generarRefreshToken = (payload, urlRequested) => {
