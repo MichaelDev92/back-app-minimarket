@@ -29,8 +29,8 @@ class Server{
 
     constructor() {
         this.app = express();
-        this.app.use(BodyParser.urlencoded({extended: false}));
-        this.app.use(BodyParser.json());
+        this.app.use(BodyParser.urlencoded({limit: '50mb', extended: true}));
+        this.app.use(BodyParser.json({limit: '50mb'}));
         this.port = Number(process.env.PORT) || 8080;
         this.server = new http.Server(this.app);
         this.initMorgan();

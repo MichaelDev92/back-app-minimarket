@@ -34,8 +34,8 @@ class Server {
             products: '/api/products'
         };
         this.app = (0, express_1.default)();
-        this.app.use(body_parser_1.default.urlencoded({ extended: false }));
-        this.app.use(body_parser_1.default.json());
+        this.app.use(body_parser_1.default.urlencoded({ limit: '50mb', extended: true }));
+        this.app.use(body_parser_1.default.json({ limit: '50mb' }));
         this.port = Number(process.env.PORT) || 8080;
         this.server = new http_1.default.Server(this.app);
         this.initMorgan();
