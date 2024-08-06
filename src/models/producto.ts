@@ -29,6 +29,10 @@ const Producto = db.define('Producto', {
         type: DataTypes.INTEGER,
         field: 'stock',
     },
+    images:{
+        type: DataTypes.TEXT,
+        field: 'images',
+    },
     subtotal:{
         type: DataTypes.DOUBLE,
         field: 'subtotal',

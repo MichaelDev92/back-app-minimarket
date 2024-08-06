@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -29,6 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.crearFechaFormateada = exports.generarRefreshToken = exports.generarToken = exports.refreshToken = exports.validateToken = void 0;
 const jsonwebtoken_1 = __importStar(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const session_cliente_1 = __importDefault(require("../models/session_cliente"));
 dotenv_1.default.config();
 const validateToken = (req, res, next) => {
     const headerToken = req.headers['authorization'];
@@ -44,18 +54,34 @@ const validateToken = (req, res, next) => {
     if (headerToken !== undefined && headerToken.startsWith('Bearer ')) {
         try {
             const bearerToken = headerToken.slice(7);
-            jsonwebtoken_1.default.verify(bearerToken, keyName, (err, _decoded) => {
+            const tokenDecoded = JSON.parse(Buffer.from(bearerToken.split('.')[1], 'base64').toString());
+            jsonwebtoken_1.default.verify(bearerToken, keyName, (err, _decoded) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err instanceof jsonwebtoken_1.TokenExpiredError) {
-                    return res.status(401).json({ error: 'El jwt ha expirado' });
+                    const active = yield session_cliente_1.default.findOne({
+                        where: {
+                            cliente_id: tokenDecoded.client.id,
+                            estado: 1
+                        }
+                    });
+                    if (active) {
+                        yield session_cliente_1.default.update({ estado: 2 }, {
+                            where: {
+                                cliente_id: tokenDecoded.client.id
+                            }
+                        });
+                    }
+                    //console.log("desde validate token: ", tokenDecoded);
+                    //refreshToken(req, res);
+                    return res.status(401).json({ msg: 'El jwt ha expirado' });
                 }
                 if (err instanceof jsonwebtoken_1.NotBeforeError) {
-                    return res.status(401).json({ error: 'El jwt no está activo' });
+                    return res.status(401).json({ msg: 'El jwt no está activo' });
                 }
                 if (err instanceof jsonwebtoken_1.JsonWebTokenError) {
-                    return res.status(401).json({ error: 'JWT corrupto' });
+                    return res.status(401).json({ msg: 'JWT corrupto' });
                 }
                 return next();
-            });
+            }));
         }
         catch (error) {
             res.status(400).json({ error: 'Token no válido' });
@@ -69,7 +95,7 @@ const validateToken = (req, res, next) => {
 };
 exports.validateToken = validateToken;
 const refreshToken = (req, res) => {
-    const refreshToken = req.headers['refreshtoken'];
+    const refreshToken = req.headers['refresh-token'];
     const urlRequested = req.baseUrl;
     if (!refreshToken) {
         return res.status(401).json({ msg: 'El Token de actualización no se encuentra en el header' });
@@ -78,30 +104,44 @@ const refreshToken = (req, res) => {
     if (refreshToken !== undefined && refreshToken.startsWith('Bearer ')) {
         try {
             const bearerToken = refreshToken === null || refreshToken === void 0 ? void 0 : refreshToken.slice(7);
-            jsonwebtoken_1.default.verify(bearerToken, keyName, (error, _decoded) => {
+            const tokenDecoded = JSON.parse(Buffer.from(bearerToken.split('.')[1], 'base64').toString());
+            jsonwebtoken_1.default.verify(bearerToken, keyName, (error, _decoded) => __awaiter(void 0, void 0, void 0, function* () {
                 if (error instanceof jsonwebtoken_1.TokenExpiredError) {
-                    return res.status(401).json({ error: 'El jwt ha expirado' });
+                    const active = yield session_cliente_1.default.findOne({
+                        where: {
+                            cliente_id: tokenDecoded.client.id,
+                            estado: 1
+                        }
+                    });
+                    if (active) {
+                        yield session_cliente_1.default.update({ estado: 2 }, {
+                            where: {
+                                cliente_id: tokenDecoded.client.id
+                            }
+                        });
+                    }
+                    return res.status(401).json({ msg: 'El jwt ha expirado' });
                 }
                 if (error instanceof jsonwebtoken_1.NotBeforeError) {
-                    return res.status(401).json({ error: 'El jwt no está activo' });
+                    return res.status(401).json({ msg: 'El jwt no está activo' });
                 }
                 if (error instanceof jsonwebtoken_1.JsonWebTokenError) {
-                    return res.status(401).json({ error: 'JWT corrupto' });
+                    return res.status(401).json({ msg: 'JWT corrupto' });
                 }
                 return;
-            });
+            }));
             const decoded = jsonwebtoken_1.default.decode(bearerToken, { complete: true });
             const payload = decoded.payload;
-            const token = generarToken({ user: payload.user, store: payload.store }, urlRequested);
+            const token = generarToken({ client: payload.client }, urlRequested);
             return res.status(200).json({ token });
         }
         catch (error) {
-            return res.status(400).json({ error: 'Token no válido' });
+            return res.status(400).json({ msg: 'Token no válido' });
         }
     }
     else {
         return res.status(403).json({
-            error: 'Acceso denegado'
+            msg: 'Acceso denegado'
         });
     }
 };

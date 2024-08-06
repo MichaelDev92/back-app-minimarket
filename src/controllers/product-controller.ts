@@ -6,6 +6,9 @@ import TipoProducto from "../models/tipo_producto";
 import Cliente from "../models/cliente";
 import ProductoCliente from "../models/producto_cliente";
 import Producto from "../models/producto";
+import path from "path";
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -17,7 +20,7 @@ export const getProducts = async (req: Request, res: Response) =>{
 
     const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
 
-    let _id = tokenDecoded.id;
+    let _id = tokenDecoded.client.id;
 
     let productos = null;
 
@@ -33,9 +36,12 @@ export const getProducts = async (req: Request, res: Response) =>{
     
 }
 
-// export const getProductsByCategory = async (req: Request, res: Response) =>{
-    
-// }
+export const getProductsByCategory = async (req: Request, res: Response) =>{
+    let {body} = req;
+    console.log(body);
+
+    res.status(200);
+}
 
 export const addProduct = async (req: Request, res: Response) =>{
     
@@ -47,21 +53,81 @@ export const addProduct = async (req: Request, res: Response) =>{
 
     let {body} = req;
 
-    const product = Producto.create(body);
+    const dataImages = body.images;
 
-    if(!product){
-        return res.status(412).json({msg: "Error al crear producto"});
+    const fechaHoy = crearFechaFormateada();
+
+    body.images = "";
+    let imagesDir = "";
+
+    let fullBody = {
+        ...body,
+        created_at: fechaHoy,
+        updated_at: fechaHoy
     }
 
+    const productOK = await Producto.create(fullBody);
+
+    if(!productOK){
+        return res.status(412).json({msg: "Error al crear producto"});
+    }
+    const directdir = path.resolve( __dirname, '../public');
+    const targetPath = path.join(directdir, tokenDecoded.client.nit, String(productOK.dataValues['id']) )
+    const dir = path.resolve(targetPath);
+
+    if(!fs.existsSync(dir)){
+        fs.mkdirSync(dir,{recursive:true});
+        console.log(`directorio ${dir} creado.`)
+    }else console.log(`ya existe el directorio ${dir}`);
+
+    if(dataImages !== "" && dataImages.includes('!')){
+        const images = dataImages.split(',');
+    
+        images.map((img:any) =>{
+            const base64Data = img.replace(/^data:image\/\w+;base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+            const imgUUID = uuidv4();
+            const simplifiedUUID = imgUUID.replace('-','');
+            const imgPath = path.join(dir, simplifiedUUID + '.jpg');
+            imagesDir += imgPath + ",";
+            fs.writeFileSync(imgPath, buffer);
+        });
+
+        const updatedProductImages = await Producto.update({images: imagesDir},{
+            where: {id: productOK.dataValues['id']}
+        });
+    
+        console.log(updatedProductImages);
+    }else if(dataImages !== ""){
+        const base64Data = dataImages.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        const imgUUID = uuidv4();
+        const simplifiedUUID = imgUUID.replace("-","");
+        const imgPath = path.join(dir, simplifiedUUID + ".jpg");
+        fs.writeFileSync(imgPath, buffer);
+
+        const updatedProductImages = await Producto.update({images: imgPath},{
+            where: {id: productOK.dataValues['id']}
+        });
+    
+        console.log(updatedProductImages);
+    }else console.log("no hay imagenes para subir");
+
+
     const client = await Cliente.findOne({
-        where: {id: tokenDecoded.id}
+        where: {id: tokenDecoded.client.id}
     })
 
     if(!client){
         return res.status(412).json({msg: "Cliente no encontrado"});
     }
 
-    const productClient = ProductoCliente.create(body);
+    let bodyProductClient = {
+        cliente_id: client.dataValues['id'],
+        producto_id: productOK.dataValues['id']
+    }
+
+    const productClient = ProductoCliente.create(bodyProductClient);
 
     if(!productClient){
         return res.status(412).json({msg: "Error al crear producto cliente"});
@@ -70,13 +136,19 @@ export const addProduct = async (req: Request, res: Response) =>{
     return res.status(200).json({msg: 'Producto creado con éxito.'})
 }
 
-// export const updateProduct = async (req: Request, res: Response) =>{
-    
-// }
+export const updateProduct = async (req: Request, res: Response) =>{
+    let {body} = req;
+    console.log(body);
 
-// export const deleteProduct = async (req: Request, res: Response) =>{
-    
-// }
+    res.status(200);
+}
+
+export const deleteProduct = async (req: Request, res: Response) =>{
+    let {body} = req;
+    console.log(body);
+
+    res.status(200);
+}
 
 export const getCategories = async(_req: Request, res: Response) =>{
 
@@ -84,7 +156,14 @@ export const getCategories = async(_req: Request, res: Response) =>{
 
     if(!categorias){
         return res.status(404).json({msg: 'No se encontraron categorias'});
-    }else return res.status(202).json({categorias});
+    }
+
+    categorias.map(cat =>{
+        delete cat.dataValues['created_at'];
+        delete cat.dataValues['updated_at'];
+    });
+    
+    return res.status(202).json({categorias});
 }
 
 export const getCategoryById = async(req: Request, res: Response) =>{
