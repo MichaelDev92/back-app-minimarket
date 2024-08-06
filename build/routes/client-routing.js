@@ -17,11 +17,11 @@ router.get('/getByNit', [
 ], util_1.validateToken, client_controller_1.getClienteByNit);
 router.post('/', [
     (0, express_validator_1.body)('nit', 'El nit no está presente en la petición').exists(),
-    (0, express_validator_1.body)('nombre', 'El nombres no está presente en la petición').exists(),
-    (0, express_validator_1.body)('correo', 'El nombres no está presente en la petición').exists(),
-    (0, express_validator_1.body)('password', 'El nombres no está presente en la petición').exists(),
-    (0, express_validator_1.body)('telefono', 'El nombres no está presente en la petición').exists(),
-    (0, express_validator_1.body)('estado', 'El nombres no está presente en la petición').exists(),
+    (0, express_validator_1.body)('nombre', 'El nombre no está presente en la petición').exists(),
+    (0, express_validator_1.body)('correo', 'El correo no está presente en la petición').exists(),
+    (0, express_validator_1.body)('password', 'El password no está presente en la petición').exists(),
+    (0, express_validator_1.body)('telefono', 'El telefono no está presente en la petición').exists(),
+    (0, express_validator_1.body)('estado', 'El estado no está presente en la petición').exists(),
 ], client_controller_1.postCliente);
 router.put('/', [], util_1.validateToken, client_controller_1.putCliente);
 router.put('/delete', (0, express_validator_1.query)('nombres', 'El parametro nombres no se encuentra presente en la peticion').exists(), util_1.validateToken, client_controller_1.deleteCliente);

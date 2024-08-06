@@ -18,11 +18,11 @@ router.get('/getByNit', [
                 ], validateToken, getClienteByNit);
 router.post('/', [
     body('nit', 'El nit no está presente en la petición').exists(),
-    body('nombre', 'El nombres no está presente en la petición').exists(),
-    body('correo', 'El nombres no está presente en la petición').exists(),
-    body('password', 'El nombres no está presente en la petición').exists(),
-    body('telefono', 'El nombres no está presente en la petición').exists(),
-    body('estado', 'El nombres no está presente en la petición').exists(),
+    body('nombre', 'El nombre no está presente en la petición').exists(),
+    body('correo', 'El correo no está presente en la petición').exists(),
+    body('password', 'El password no está presente en la petición').exists(),
+    body('telefono', 'El telefono no está presente en la petición').exists(),
+    body('estado', 'El estado no está presente en la petición').exists(),
                     ],postCliente);
 router.put('/', [],validateToken, putCliente);
 router.put('/delete', 

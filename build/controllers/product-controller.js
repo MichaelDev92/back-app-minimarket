@@ -12,43 +12,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCategory = exports.getCategoryById = exports.getCategories = exports.getProducts = void 0;
+exports.addCategory = exports.getCategoryById = exports.getCategories = exports.addProduct = exports.getProducts = void 0;
 const express_validator_1 = require("express-validator");
-// import db from "../db/connection";
+const connection_1 = __importDefault(require("../db/connection"));
 const util_1 = require("../utils/util");
-// import bcrypt from 'bcrypt';
-// import Producto from "../models/producto";
 const tipo_producto_1 = __importDefault(require("../models/tipo_producto"));
 const cliente_1 = __importDefault(require("../models/cliente"));
 const producto_cliente_1 = __importDefault(require("../models/producto_cliente"));
+const producto_1 = __importDefault(require("../models/producto"));
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.slice(7).split('.')[1];
+    console.log("token data client: ", token);
     const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
-    const cliente = yield cliente_1.default.findOne({
-        where: { nit: tokenDecoded.nit }
+    let _id = tokenDecoded.id;
+    let productos = null;
+    connection_1.default.query('CALL ListarProductosCliente(:id)', { replacements: { id: _id } })
+        .then(response => {
+        productos = response;
+        res.status(200).json({ productos });
+    })
+        .catch(error => {
+        res.status(412).json({ msg: error });
     });
-    const products = yield producto_cliente_1.default.findAll({
-        where: { cliente_id: cliente === null || cliente === void 0 ? void 0 : cliente.dataValues['id'] }
-    });
-    if (!products) {
-        return res.status(404).json({ message: 'No hay productos' });
-    }
-    if (!cliente) {
-        return res.status(412).json({ message: 'No autorizado' });
-    }
-    const categorias = yield tipo_producto_1.default.findAll();
-    if (!categorias) {
-        return res.status(404).json({ msg: 'No se encontraron categorias' });
-    }
-    else
-        return res.status(202).json({ categorias });
 });
 exports.getProducts = getProducts;
 // export const getProductsByCategory = async (req: Request, res: Response) =>{
 // }
-// export const addProduct = async (req: Request, res: Response) =>{
-// }
+const addProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.slice(7).split('.')[1];
+    console.log("token data client: ", token);
+    const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
+    let { body } = req;
+    const product = producto_1.default.create(body);
+    if (!product) {
+        return res.status(412).json({ msg: "Error al crear producto" });
+    }
+    const client = yield cliente_1.default.findOne({
+        where: { id: tokenDecoded.id }
+    });
+    if (!client) {
+        return res.status(412).json({ msg: "Cliente no encontrado" });
+    }
+    const productClient = producto_cliente_1.default.create(body);
+    if (!productClient) {
+        return res.status(412).json({ msg: "Error al crear producto cliente" });
+    }
+    return res.status(200).json({ msg: 'Producto creado con éxito.' });
+});
+exports.addProduct = addProduct;
 // export const updateProduct = async (req: Request, res: Response) =>{
 // }
 // export const deleteProduct = async (req: Request, res: Response) =>{
