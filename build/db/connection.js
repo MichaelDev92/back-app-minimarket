@@ -23,6 +23,6 @@ const db = new sequelize_1.Sequelize(db_name, user_name, user_password, {
 //     define:{
 //         timestamps: false
 //     },
-//     // logging: false
+//     // logging: console.log
 // });
 exports.default = db;

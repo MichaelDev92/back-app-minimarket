@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { Result, validationResult } from "express-validator";
-// import db from "../db/connection";
+import db from "../db/connection";
 import { crearFechaFormateada } from "../utils/util";
-// import bcrypt from 'bcrypt';
-// import Producto from "../models/producto";
 import TipoProducto from "../models/tipo_producto";
 import Cliente from "../models/cliente";
 import ProductoCliente from "../models/producto_cliente";
+import Producto from "../models/producto";
 
 
 
@@ -14,31 +13,23 @@ export const getProducts = async (req: Request, res: Response) =>{
 
     const token = <string> req.headers['authorization']?.slice(7).split('.')[1]
 
+    console.log("token data client: ", token);
+
     const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
 
-    const cliente = await Cliente.findOne({
-        where: { nit: tokenDecoded.nit }
-    });
+    let _id = tokenDecoded.id;
 
+    let productos = null;
 
-    const products = await ProductoCliente.findAll({
-        where: { cliente_id: cliente?.dataValues['id'] }
-    });
-
-    if(!products){
-        return res.status(404).json({ message: 'No hay productos' });
-    }
-
-    
-    if (!cliente) {
-        return res.status(412).json({ message: 'No autorizado' });
-    }
-
-    const categorias = await TipoProducto.findAll();
-
-    if(!categorias){
-        return res.status(404).json({msg: 'No se encontraron categorias'});
-    }else return res.status(202).json({categorias});
+    db.query('CALL ListarProductosCliente(:id)', 
+    {replacements: { id: _id}})
+        .then( response =>{
+            productos = response;
+            res.status(200).json({productos});
+        })
+        .catch(error =>{
+            res.status(412).json({msg: error});
+        });
     
 }
 
@@ -46,9 +37,38 @@ export const getProducts = async (req: Request, res: Response) =>{
     
 // }
 
-// export const addProduct = async (req: Request, res: Response) =>{
+export const addProduct = async (req: Request, res: Response) =>{
     
-// }
+    const token = <string> req.headers['authorization']?.slice(7).split('.')[1]
+
+    console.log("token data client: ", token);
+
+    const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
+
+    let {body} = req;
+
+    const product = Producto.create(body);
+
+    if(!product){
+        return res.status(412).json({msg: "Error al crear producto"});
+    }
+
+    const client = await Cliente.findOne({
+        where: {id: tokenDecoded.id}
+    })
+
+    if(!client){
+        return res.status(412).json({msg: "Cliente no encontrado"});
+    }
+
+    const productClient = ProductoCliente.create(body);
+
+    if(!productClient){
+        return res.status(412).json({msg: "Error al crear producto cliente"});
+    }
+
+    return res.status(200).json({msg: 'Producto creado con éxito.'})
+}
 
 // export const updateProduct = async (req: Request, res: Response) =>{
     

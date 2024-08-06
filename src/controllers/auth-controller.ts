@@ -110,3 +110,24 @@ export const getNit = async (req: Request, res: Response) =>{
         return res.status(200).json(true);
     }else return res.status(404).json(false);
 }
+
+export const logout = async(req: Request, res: Response) =>{
+
+    const token = <string> req.headers['authorization']?.slice(7).split('.')[1]
+
+    const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
+
+    try {
+        const session = await SessionCliente.update({estado: 2},{
+            where: {
+                cliente_id: tokenDecoded.client.id
+            }
+        });  
+        console.log(session);
+        return res.status(200).json({msg: "Se ha cerrrado la sesión correctamente."});      
+    } catch (error) {
+        return res.status(412).json({msg: "Ocurrió un error al momento de cerrar la sesión."})
+    }
+
+
+}

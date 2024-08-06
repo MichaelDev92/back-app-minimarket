@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNit = exports.getAuthentication = void 0;
+exports.logout = exports.getNit = exports.getAuthentication = void 0;
 const express_validator_1 = require("express-validator");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -105,3 +105,21 @@ const getNit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(404).json(false);
 });
 exports.getNit = getNit;
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.slice(7).split('.')[1];
+    const tokenDecoded = JSON.parse(Buffer.from(token, 'base64').toString());
+    try {
+        const session = yield session_cliente_1.default.update({ estado: 2 }, {
+            where: {
+                cliente_id: tokenDecoded.client.id
+            }
+        });
+        console.log(session);
+        return res.status(200).json({ msg: "Se ha cerrrado la sesión correctamente." });
+    }
+    catch (error) {
+        return res.status(412).json({ msg: "Ocurrió un error al momento de cerrar la sesión." });
+    }
+});
+exports.logout = logout;
