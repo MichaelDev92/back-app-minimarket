@@ -137,7 +137,7 @@ const generarToken = (payload: any, urlRequested: any) =>{
 
     const keyName = urlRequested.includes('/api/') ? process.env.SYS_KEY || '%SYS#KEY%' : process.env.STORE_KEY || '#STORE$KEY^';
 
-    return jwt.sign(payload, keyName, {expiresIn: '15m'});
+    return jwt.sign(payload, keyName, {expiresIn: '45m'});
 }
 
 const generarRefreshToken = (payload: any, urlRequested: any) =>{
