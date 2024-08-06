@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getNit = exports.getAuthentication = void 0;
 const express_validator_1 = require("express-validator");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -85,4 +86,22 @@ const getAuthentication = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
 });
-exports.default = getAuthentication;
+exports.getAuthentication = getAuthentication;
+const getNit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = (0, express_validator_1.validationResult)(req);
+    if (!result.isEmpty()) {
+        return res.status(500).json(result['errors']);
+    }
+    const { nit } = req.body;
+    const exist = yield cliente_1.default.findOne({
+        where: {
+            nit: nit
+        }
+    });
+    if (exist) {
+        return res.status(200).json(true);
+    }
+    else
+        return res.status(404).json(false);
+});
+exports.getNit = getNit;

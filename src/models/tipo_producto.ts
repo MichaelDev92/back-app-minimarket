@@ -7,6 +7,7 @@ const TipoProducto = db.define('TipoProducto',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     descripcion:{
         type: DataTypes.STRING(100),

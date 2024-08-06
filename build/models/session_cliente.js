@@ -10,6 +10,7 @@ const SessionCliente = connection_1.default.define('SessionCliente', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     cliente_id: {
         type: sequelize_1.DataTypes.INTEGER,

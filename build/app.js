@@ -18,6 +18,9 @@ const http_1 = __importDefault(require("http"));
 const connection_1 = __importDefault(require("./db/connection"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const morgan_1 = __importDefault(require("morgan"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 /* importing routes */
 const auth_1 = __importDefault(require("./routes/auth"));
 const client_routing_1 = __importDefault(require("./routes/client-routing"));
@@ -33,9 +36,9 @@ class Server {
         this.app = (0, express_1.default)();
         this.app.use(body_parser_1.default.urlencoded({ extended: false }));
         this.app.use(body_parser_1.default.json());
-        console.log("desde app.ts env: ", process.env.PORT);
         this.port = Number(process.env.PORT) || 8080;
         this.server = new http_1.default.Server(this.app);
+        this.initMorgan();
         this.dbConnection();
         this.middlewares();
         this.routes();
@@ -66,6 +69,19 @@ class Server {
         this.app.use(this.apiPaths.clients, client_routing_1.default);
         this.app.use(this.apiPaths.auth, auth_1.default);
         this.app.use(this.apiPaths.products, product_routing_1.default);
+        this.app.disable('x-powered-by');
+    }
+    initMorgan() {
+        const logDirectory = path_1.default.join(__dirname, 'logs');
+        try {
+            fs_1.default.accessSync(logDirectory, fs_1.default.constants.W_OK);
+            console.log('Permisos de escritura verificados en el directorio de logs.');
+        }
+        catch (_error) {
+            console.error('No se puede escribir en el directorio de logs:', _error.message);
+        }
+        const accessLogStream = fs_1.default.createWriteStream(path_1.default.join(logDirectory, 'access.log'), { flags: 'a' });
+        this.app.use((0, morgan_1.default)('combined', { stream: accessLogStream }));
     }
     listen() {
         this.server.listen(this.port, () => {

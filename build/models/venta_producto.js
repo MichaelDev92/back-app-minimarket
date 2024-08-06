@@ -10,6 +10,7 @@ const VentaProducto = connection_1.default.define('VentaProducto', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     fecha_venta: {
         type: sequelize_1.DataTypes.DATE,

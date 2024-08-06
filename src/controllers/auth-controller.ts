@@ -12,7 +12,7 @@ import { generarToken, generarRefreshToken } from "../utils/util";
 
 dotenv.config();
 
-const getAuthentication = async (req: Request, res: Response)=>{
+export const getAuthentication = async (req: Request, res: Response)=>{
 
     const result : Result<any> = validationResult(req);   
 
@@ -91,4 +91,22 @@ const getAuthentication = async (req: Request, res: Response)=>{
     }
 }
 
-export default getAuthentication;
+export const getNit = async (req: Request, res: Response) =>{  
+    const result : Result<any> = validationResult(req);   
+
+    if(!result.isEmpty()){
+        return res.status(500).json(result['errors']);
+    }
+
+    const {nit} = req.body;
+
+    const exist = await Cliente.findOne({
+        where: {
+            nit: nit
+        }
+    });
+
+    if(exist){
+        return res.status(200).json(true);
+    }else return res.status(404).json(false);
+}

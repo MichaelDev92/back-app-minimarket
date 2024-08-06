@@ -20,7 +20,7 @@ export const getClientes = async(req: Request, res: Response) => {
     let _estado = req.query.celular;
     let clientes = null;
 
-    return db.query('CALL ListarClientes(:nombres, :apellidos, :numero_documento, :correo, :celular)',
+    return db.query('CALL ListarClientes(:nit, :nombre, :correo, :telefono, :estado)',
     {replacements: {nit: _nit, nombre: _nombre, correo: _correo, telefono: _telefono, estado: _estado}})
     .then(response =>{
         clientes = response;

@@ -29,7 +29,7 @@ const getClientes = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     let _telefono = req.query.correo;
     let _estado = req.query.celular;
     let clientes = null;
-    return connection_1.default.query('CALL ListarClientes(:nombres, :apellidos, :numero_documento, :correo, :celular)', { replacements: { nit: _nit, nombre: _nombre, correo: _correo, telefono: _telefono, estado: _estado } })
+    return connection_1.default.query('CALL ListarClientes(:nit, :nombre, :correo, :telefono, :estado)', { replacements: { nit: _nit, nombre: _nombre, correo: _correo, telefono: _telefono, estado: _estado } })
         .then(response => {
         clientes = response;
         if (clientes.length > 0) {

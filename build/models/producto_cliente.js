@@ -10,6 +10,7 @@ const ProductoCliente = connection_1.default.define('ProductoCliente', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     producto_id: {
         type: sequelize_1.DataTypes.INTEGER,

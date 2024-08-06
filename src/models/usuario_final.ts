@@ -7,6 +7,7 @@ const UsuarioFinal = db.define('UsuarioFinal',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     nombre:{
         type: DataTypes.STRING(150),
