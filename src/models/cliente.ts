@@ -5,7 +5,8 @@ const Cliente = db.define('Cliente',{
     id:{
         type: DataTypes.INTEGER,
         field: 'id',
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     nit:{
         type: DataTypes.STRING,

@@ -7,6 +7,7 @@ const TipoDocumento = db.define('TipoDocumento',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     fecha_venta:{
         type: DataTypes.DATE,

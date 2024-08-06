@@ -10,6 +10,7 @@ const DetalleVentaProducto = connection_1.default.define('DetalleVentaProducto',
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     venta_id: {
         type: sequelize_1.DataTypes.INTEGER,

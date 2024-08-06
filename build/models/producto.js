@@ -10,6 +10,7 @@ const Producto = connection_1.default.define('Producto', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     nombre: {
         type: sequelize_1.DataTypes.STRING,

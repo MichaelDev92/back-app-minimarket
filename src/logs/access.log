@@ -1,0 +1,4 @@
+::ffff:127.0.0.1 - - [05/Aug/2024:22:44:47 +0000] "POST /api/auth HTTP/1.1" 200 715 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [05/Aug/2024:22:45:06 +0000] "POST /api/auth HTTP/1.1" 406 38 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Aug/2024:00:09:53 +0000] "POST /api/clients HTTP/1.1" 200 269 "-" "Thunder Client (https://www.thunderclient.com)"
+::ffff:127.0.0.1 - - [06/Aug/2024:00:38:50 +0000] "POST /api/auth/getNit HTTP/1.1" 200 4 "-" "Thunder Client (https://www.thunderclient.com)"

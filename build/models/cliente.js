@@ -9,7 +9,8 @@ const Cliente = connection_1.default.define('Cliente', {
     id: {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     nit: {
         type: sequelize_1.DataTypes.STRING,

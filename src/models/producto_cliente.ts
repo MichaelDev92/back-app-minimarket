@@ -7,6 +7,7 @@ const ProductoCliente = db.define('ProductoCliente',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     producto_id:{
         type: DataTypes.INTEGER,

@@ -9,8 +9,6 @@ const user_password = <string> process.env.DB_PASSWORD;
 const port_db = Number(process.env.DB_PORT);
 const host_url = <string> process.env.DB_HOST_URL;
 
-console.log("db name: ", db_name, " username: ", user_name, " userpassword: ", user_password, " port: ", port_db, " host:", host_url);
-
 const db = new Sequelize(db_name, user_name, user_password, {
     host: host_url,
     port: port_db,

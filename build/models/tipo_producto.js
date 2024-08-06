@@ -10,6 +10,7 @@ const TipoProducto = connection_1.default.define('TipoProducto', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     descripcion: {
         type: sequelize_1.DataTypes.STRING(100),

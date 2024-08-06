@@ -7,6 +7,7 @@ const SessionCliente = db.define('SessionCliente',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     cliente_id:{
         type: DataTypes.INTEGER,

@@ -7,6 +7,7 @@ const VentaProducto = db.define('VentaProducto',{
         type: DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     fecha_venta:{
         type: DataTypes.DATE,

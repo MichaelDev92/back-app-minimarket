@@ -10,6 +10,7 @@ const UsuarioFinal = connection_1.default.define('UsuarioFinal', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'id',
         primaryKey: true,
+        autoIncrement: true
     },
     nombre: {
         type: sequelize_1.DataTypes.STRING(150),

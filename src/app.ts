@@ -4,6 +4,9 @@ import http from 'http';
 import  db  from './db/connection';
 import BodyParser from 'body-parser';
 import dotenv from "dotenv";
+import morgan from "morgan";
+import fs from "fs";
+import path from 'path';
 
 
 /* importing routes */
@@ -28,9 +31,9 @@ class Server{
         this.app = express();
         this.app.use(BodyParser.urlencoded({extended: false}));
         this.app.use(BodyParser.json());
-        console.log("desde app.ts env: ", process.env.PORT)
         this.port = Number(process.env.PORT) || 8080;
         this.server = new http.Server(this.app);
+        this.initMorgan();
         this.dbConnection();
         this.middlewares();
         this.routes();
@@ -69,6 +72,20 @@ class Server{
         this.app.use(this.apiPaths.clients, clientRouting);
         this.app.use(this.apiPaths.auth, auth);
         this.app.use(this.apiPaths.products, productRouting);
+
+        this.app.disable('x-powered-by');
+    }
+
+    initMorgan(){
+        const logDirectory = path.join(__dirname, 'logs');
+        try {
+            fs.accessSync(logDirectory, fs.constants.W_OK);
+            console.log('Permisos de escritura verificados en el directorio de logs.');
+          } catch (_error: any) {
+            console.error('No se puede escribir en el directorio de logs:', _error.message);
+          }
+        const accessLogStream= fs.createWriteStream(path.join(logDirectory, 'access.log'), {flags: 'a'});
+        this.app.use(morgan('combined', { stream: accessLogStream }));
     }
 
     listen(){
