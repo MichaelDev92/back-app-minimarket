@@ -32,6 +32,10 @@ const Producto = connection_1.default.define('Producto', {
         type: sequelize_1.DataTypes.INTEGER,
         field: 'stock',
     },
+    images: {
+        type: sequelize_1.DataTypes.TEXT,
+        field: 'images',
+    },
     subtotal: {
         type: sequelize_1.DataTypes.DOUBLE,
         field: 'subtotal',

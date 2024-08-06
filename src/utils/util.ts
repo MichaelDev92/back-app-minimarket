@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JsonWebTokenError, NotBeforeError, TokenExpiredError } from "jsonwebtoken";
 import dotenv from "dotenv";
+import SessionCliente from "../models/session_cliente";
 
 dotenv.config();
 
@@ -23,16 +24,33 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 
         try {
             const bearerToken = headerToken.slice(7);
+            const tokenDecoded = JSON.parse(Buffer.from(bearerToken.split('.')[1], 'base64').toString());
     
-            jwt.verify(bearerToken, keyName, (err: any, _decoded: any) => {
+            jwt.verify(bearerToken, keyName, async (err: any, _decoded: any) => {
                 if (err instanceof TokenExpiredError) {
-                  return res.status(401).json({ error: 'El jwt ha expirado' });
+                    const active = await SessionCliente.findOne({
+                        where: {
+                            cliente_id: tokenDecoded.client.id,
+                            estado: 1
+                        }                        
+                    });
+
+                    if(active){
+                        await SessionCliente.update({estado: 2},{
+                            where: {
+                                cliente_id: tokenDecoded.client.id
+                            }
+                        });
+                    }
+                    //console.log("desde validate token: ", tokenDecoded);
+                    //refreshToken(req, res);
+                  return res.status(401).json({ msg: 'El jwt ha expirado' });
                 }
                 if (err instanceof NotBeforeError) {
-                  return res.status(401).json({ error: 'El jwt no está activo' });
+                  return res.status(401).json({ msg: 'El jwt no está activo' });
                 }
                 if (err instanceof JsonWebTokenError) {
-                  return res.status(401).json({ error: 'JWT corrupto' });
+                  return res.status(401).json({ msg: 'JWT corrupto' });
                 }
 
                 return next();
@@ -52,7 +70,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 
 const refreshToken = (req: Request, res: Response)=>{
 
-    const refreshToken : string = <string>req.headers['refreshtoken'];
+    const refreshToken : string = <string>req.headers['refresh-token'];
     const urlRequested = req.baseUrl;
 
     if(!refreshToken){
@@ -66,17 +84,32 @@ const refreshToken = (req: Request, res: Response)=>{
         try {
 
             const bearerToken: string = refreshToken?.slice(7)!;
+            const tokenDecoded = JSON.parse(Buffer.from(bearerToken.split('.')[1], 'base64').toString());
 
-            jwt.verify(bearerToken, keyName, (error: any, _decoded: any)=>{
+            jwt.verify(bearerToken, keyName, async (error: any, _decoded: any)=>{
 
                 if (error instanceof TokenExpiredError) {
-                    return res.status(401).json({ error: 'El jwt ha expirado' });
+                    const active = await SessionCliente.findOne({
+                        where: {
+                            cliente_id: tokenDecoded.client.id,
+                            estado: 1
+                        }                        
+                    });
+
+                    if(active){
+                        await SessionCliente.update({estado: 2},{
+                            where: {
+                                cliente_id: tokenDecoded.client.id
+                            }
+                        });
+                    }
+                    return res.status(401).json({ msg: 'El jwt ha expirado' });
                 }
                 if (error instanceof NotBeforeError) {
-                    return res.status(401).json({ error: 'El jwt no está activo' });
+                    return res.status(401).json({ msg: 'El jwt no está activo' });
                 }
                 if (error instanceof JsonWebTokenError) {
-                    return res.status(401).json({ error: 'JWT corrupto' });
+                    return res.status(401).json({ msg: 'JWT corrupto' });
                 }
 
                 return;
@@ -86,16 +119,16 @@ const refreshToken = (req: Request, res: Response)=>{
 
             const payload = decoded.payload;
 
-            const token = generarToken({user: payload.user, store: payload.store}, urlRequested);
+            const token = generarToken({client: payload.client}, urlRequested);
 
             return res.status(200).json({token});
 
         } catch (error) {
-            return res.status(400).json({error: 'Token no válido'})
+            return res.status(400).json({msg: 'Token no válido'})
         }
     }else{
         return res.status(403).json({
-            error: 'Acceso denegado'
+            msg: 'Acceso denegado'
         });
     }
 }
