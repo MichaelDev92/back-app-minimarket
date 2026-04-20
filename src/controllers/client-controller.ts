@@ -5,6 +5,11 @@ import db from "../db/connection";
 import { crearFechaFormateada } from "../utils/util";
 import bcrypt from 'bcrypt';
 
+
+export enum ProductTypes {
+    TECH = 'techonology'
+}
+
 export const getClientes = async(req: Request, res: Response) => {
 
     const results = validationResult(req);

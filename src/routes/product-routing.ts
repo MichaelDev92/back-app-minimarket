@@ -6,7 +6,8 @@ import { addCategory, addProduct, deleteProduct, getCategories, getCategoryById,
 const router = Router();
 
 router.get('/',validateToken, getProducts);
-router.get('/getByCategory', validateToken, getProductsByCategory);
+router.get('/getByCategory', [query('tipo_producto','No se encuentra el parametro id en la peticion').exists], 
+            validateToken, getProductsByCategory);
 router.post('/',[
     body('nombre').not().isEmpty().withMessage('Nombre es requerido.'),
     body('valor').not().isEmpty().withMessage('Valor es requerido.'),
